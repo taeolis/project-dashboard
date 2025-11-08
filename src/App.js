@@ -1,11 +1,10 @@
 import "./App.css";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   TextField,
   InputAdornment,
   IconButton,
   Box,
-  Paper,
   Typography,
   Button,
 } from "@mui/material";
@@ -14,6 +13,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import NewProjectDialog from "./components/NewProjectDialog";
 import ProjectCard from "./components/ProjectCard";
 import ProjectDetails from "./components/ProjectDetails";
+import { APP_COLORS } from "./constants/colors";
 
 function App() {
   const [open, setOpen] = useState(false);
@@ -25,7 +25,6 @@ function App() {
   const handleClose = () => setOpen(false);
 
   const handleCreateProject = (project) => {
-    console.log("New project data:", project); // for testing
     setProjects((prev) => [...prev, project]);
   };
 
@@ -41,7 +40,7 @@ function App() {
     setSelectedProject(null);
   };
 
-  // ✅ Filter logic — search both project + tasks
+  // Filter logic — search both project + tasks
   const filteredProjects = projects.filter((project) => {
     const query = searchQuery.toLowerCase();
 
@@ -90,10 +89,10 @@ function App() {
             sx={{
               width: 500,
               "& .MuiOutlinedInput-root": {
-                // borderRadius: "25px", // round corners
-                height: 50, // total height
+                height: 50,
                 "& input": {
-                  padding: "0 14px", // adjust text padding vertically
+                  color: APP_COLORS.button,
+                  padding: "0 14px",
                 },
               },
             }}
@@ -114,13 +113,12 @@ function App() {
             variant="contained"
             startIcon={<AddIcon />}
             sx={{
-              // borderRadius: 10,
               alignContent: "end",
               height: "50px",
-              backgroundColor: "#352a6aff", // custom blue
+              backgroundColor: APP_COLORS.button,
               color: "#fff",
               "&:hover": {
-                backgroundColor: "#21184aff", // darker shade on hover
+                backgroundColor: APP_COLORS.button_hovered,
               },
             }}
             onClick={handleOpen}
@@ -151,19 +149,22 @@ function App() {
             py: 2,
             pr: 2,
             maxWidth: 350,
-            minHeight: 300, // minimum height
+            minHeight: 200,
+            maxHeight: 680,
             display: "flex",
             flexDirection: "column",
-            // backgroundColor: "#e09a9aff",
+            position: "relative",
           }}
         >
+          {/* Header Section (Unchanged) */}
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            {/* Project Count and Title */}
             <Box
               sx={{
                 width: 28,
                 height: 28,
                 borderRadius: "50%",
-                backgroundColor: "#352a6a", // your theme color
+                backgroundColor: APP_COLORS.button,
                 color: "#fff",
                 display: "flex",
                 alignItems: "center",
@@ -175,7 +176,6 @@ function App() {
             >
               {filteredProjects.length}
             </Box>
-
             <Typography
               variant="h6"
               sx={{ fontWeight: "bold", textAlign: "left" }}
@@ -184,57 +184,114 @@ function App() {
             </Typography>
           </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-            }}
-          >
-            {filteredProjects.map((project, index) => (
+          {/* Projects list container (scrollable area) */}
+          {filteredProjects.length === 0 ? (
+            <Box
+              sx={{
+                flexGrow: 1,
+                overflowY: "auto",
+                display: "flex",
+                flexDirection: "column",
+                pt: 1,
+                width: "100%",
+                justifyContent: "center",
+                textAlign: "center",
+                fontSize: 16,
+                color: "#626262ff",
+                borderRadius: 3,
+                border: "3px dashed #a1a0a0ff",
+              }}
+            >
+              No Projects
+            </Box>
+          ) : (
+            <>
               <Box
-                key={index}
-                onClick={() => setSelectedProject(project)}
                 sx={{
-                  borderRadius: 3,
-                  cursor: "pointer",
-                  transition: "0.3s",
-                  backgroundColor:
-                    selectedProject === project ? "#cec8ffff" : "#ffaaaaff", // highlight color
+                  flexGrow: 1,
+                  overflowY: "auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  pt: 1,
+                  width: "100%",
                 }}
               >
-                <ProjectCard
-                  project={project}
-                  key={index}
-                  searchQuery={searchQuery}
-                />
+                {filteredProjects.map((project, index) => (
+                  <Box
+                    key={index}
+                    onClick={() => setSelectedProject(project)}
+                    sx={{
+                      borderRadius: 3,
+                      cursor: "pointer",
+                      transition: "0.3s",
+                    }}
+                  >
+                    <ProjectCard
+                      isSelected={selectedProject === project}
+                      project={project}
+                      searchQuery={searchQuery}
+                    />
+                  </Box>
+                ))}
               </Box>
-            ))}
-          </Box>
+
+              {/* Gradient Overlay */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 50,
+                  background: `linear-gradient(to bottom, transparent, ${APP_COLORS.background})`,
+                }}
+              />
+            </>
+          )}
         </Box>
 
         {/* Project Detail*/}
 
-        <Box
-          sx={{
-            flex: 2,
-            p: 3,
-            textAlign: "center",
-            minHeight: 300, // minimum height
-            display: "flex",
-            flexDirection: "column",
-            borderRadius: 4,
-            boxShadow: 5,
-            backgroundColor: "#ffff",
-          }}
-        >
-          {selectedProject && (
-            <ProjectDetails
-              project={selectedProject}
-              onUpdate={handleUpdateProject}
-              onDelete={handleDeleteProject}
-            />
-          )}
-        </Box>
+        {selectedProject ? (
+          <Box
+            sx={{
+              flex: 2,
+              p: 3,
+              textAlign: "center",
+              minHeight: 650,
+              display: "flex",
+              flexDirection: "column",
+              borderRadius: 2,
+              boxShadow: 2,
+              backgroundColor: APP_COLORS.card,
+            }}
+          >
+            {selectedProject && (
+              <ProjectDetails
+                project={selectedProject}
+                onUpdate={handleUpdateProject}
+                onDelete={handleDeleteProject}
+              />
+            )}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              flex: 2,
+              p: 3,
+              textAlign: "center",
+              minHeight: 650,
+              display: "flex",
+              flexDirection: "column",
+              borderRadius: 2,
+              border: "3px dashed #a1a0a0ff",
+              color: "#626262ff",
+              justifyContent: "center",
+            }}
+          >
+            Select a project to edit
+          </Box>
+        )}
       </Box>
     </Box>
   );

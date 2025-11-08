@@ -1,15 +1,12 @@
-import React from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import { Box, Typography } from "@mui/material";
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { Box } from "@mui/material";
+import { APP_COLORS } from "../constants/colors";
 
-const COLORS = ["#4caf50", "#ffa03bff", "#2196f3"]; // Green=Completed, Yellow=In Progress, Blue=Pending
+const COLORS = [
+  APP_COLORS.completed,
+  APP_COLORS.in_progress,
+  APP_COLORS.pending,
+];
 
 export default function ProgressChart({ tasks }) {
   const totalTasks = tasks.length;
@@ -26,10 +23,9 @@ export default function ProgressChart({ tasks }) {
           { name: "In Progress", value: inProgressTasks },
           { name: "Pending", value: pendingTasks },
         ]
-      : [{ name: "Pending", value: 1 }]; // fallback
+      : [{ name: "None", value: 1 }];
 
-  const percentage =
-    totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+  const chartColors = totalTasks > 0 ? COLORS : ["#a9a9a9ff"];
 
   return (
     <Box
@@ -43,11 +39,6 @@ export default function ProgressChart({ tasks }) {
         borderRadius: 2,
       }}
     >
-      {/* ✅ Percentage on top */}
-      {/* <Typography variant="h6" sx={{ fontWeight: "bold", textAlign: "center" }}>
-        {percentage}% Completed
-      </Typography> */}
-
       <Box
         sx={{
           width: "100%",
@@ -58,13 +49,12 @@ export default function ProgressChart({ tasks }) {
           justifyContent: "center",
         }}
       >
-        <ResponsiveContainer>
-          <PieChart>
+        <div style={{ width: 250, height: 200 }}>
+          <PieChart width={300} height={200}>
             <Pie
               data={data}
-              cx="50%" // shifted slightly left to make room for legend
+              cx="50%"
               cy="50%"
-              innerRadius={0}
               outerRadius={70}
               cornerRadius={5}
               dataKey="value"
@@ -72,28 +62,25 @@ export default function ProgressChart({ tasks }) {
               {data.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={chartColors[index % chartColors.length]}
                 />
               ))}
             </Pie>
 
             <Tooltip />
-            {/* ✅ Legend on right side, vertically centered */}
             <Legend
               layout="vertical"
               align="right"
-              verticalAlign="top"
+              verticalAlign="middle"
               iconType="circle"
               wrapperStyle={{
                 fontSize: 16,
                 fontWeight: 500,
-                paddingLeft: 30,
-                paddingRight: 40,
                 lineHeight: "2em",
               }}
             />
           </PieChart>
-        </ResponsiveContainer>
+        </div>
       </Box>
     </Box>
   );

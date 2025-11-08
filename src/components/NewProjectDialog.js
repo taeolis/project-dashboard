@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Dialog,
@@ -9,25 +9,31 @@ import {
   Button,
   Typography,
 } from "@mui/material";
+import { APP_COLORS } from "../constants/colors";
 
 export default function NewProjectDialog({ open, handleClose, onCreate }) {
   const [projectName, setProjectName] = useState("");
   const [deadline, setDeadline] = useState("");
   const [description, setDescription] = useState("");
+  const [errors, setErrors] = useState({
+    projectName: false,
+    deadline: false,
+  });
 
   const handleCreate = () => {
-    // Simple validation
-    if (!projectName || !deadline) {
-      alert("Project Name and Deadline are required!");
-      return;
-    }
+    const newErrors = {
+      projectName: !projectName,
+      deadline: !deadline,
+    };
+
+    setErrors(newErrors);
+
+    if (newErrors.projectName || newErrors.deadline) return;
 
     if (onCreate) {
-      // always check if the function exists
       onCreate({ projectName, deadline, description });
     }
 
-    // Reset fields
     setProjectName("");
     setDeadline("");
     setDescription("");
@@ -36,78 +42,103 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Create New Project</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      PaperProps={{
+        sx: {
+          width: 500,
+          maxWidth: "90%",
+          borderRadius: 3,
+          padding: 2,
+        },
+      }}
+    >
+      <DialogTitle>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "bold", textAlign: "center" }}
+        >
+          Create New Project
+        </Typography>
+      </DialogTitle>
       <DialogContent>
         <Box
           sx={{
             display: "flex",
-            gap: 2,
-            width: "400px",
+            flexDirection: "row",
+            width: "100%",
           }}
         >
-          <Typography
+          <Box
             sx={{
-              alignContent: "center",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+              mt: 3,
             }}
           >
-            Title
-          </Typography>
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            label="Project Name"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "10px",
-              },
-            }}
-          />
-        </Box>
+            <Typography
+              sx={{
+                alignContent: "center",
+              }}
+            >
+              Name
+            </Typography>
 
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-          }}
-        >
-          <Typography
-            sx={{
-              alignContent: "center",
-            }}
-          >
-            Deadline
-          </Typography>
-          <TextField
-            margin="dense"
-            required
-            type="date"
-            fullWidth
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "10px", // rounded corners
-                height: 50, // total height
-                "& input": {
-                  fontSize: "16px", // font size
-                  color: "#333", // text color
+            <Typography
+              sx={{
+                alignContent: "center",
+              }}
+            >
+              Deadline
+            </Typography>
+          </Box>
+
+          <Box sx={{ flex: 4 }}>
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              label="Project Name"
+              fullWidth
+              value={projectName}
+              onChange={(e) => {
+                setProjectName(e.target.value);
+                setErrors({ ...errors, projectName: false });
+              }}
+              error={errors.projectName}
+              helperText={errors.projectName ? "Project name is required" : ""}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "10px",
                 },
-              },
-              "& .MuiInputLabel-root": {
-                fontSize: "14px", // label font size
-                fontWeight: 500, // label weight
-              },
-            }}
-            InputLabelProps={{ shrink: true }}
-          />
+              }}
+            />
+
+            <TextField
+              margin="dense"
+              required
+              type="date"
+              fullWidth
+              value={deadline}
+              onChange={(e) => {
+                setDeadline(e.target.value);
+                setErrors({ ...errors, deadline: false });
+              }}
+              variant="outlined"
+              error={errors.deadline}
+              helperText={errors.deadline ? "Deadline is required" : ""}
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "10px",
+                  height: 50,
+                },
+              }}
+            />
+          </Box>
         </Box>
 
         <TextField
@@ -128,8 +159,19 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleCreate}>
+        <Button onClick={handleClose} sx={{ color: APP_COLORS.button }}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleCreate}
+          sx={{
+            backgroundColor: APP_COLORS.button,
+            "&:hover": {
+              backgroundColor: APP_COLORS.button_hovered,
+            },
+          }}
+        >
           Create
         </Button>
       </DialogActions>

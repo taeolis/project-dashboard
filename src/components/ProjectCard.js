@@ -1,9 +1,9 @@
-// ProjectCard.js
-import React from "react";
+import Chip from "@mui/material/Chip";
 import { Paper, Typography, Box } from "@mui/material";
 import { AccessTime } from "@mui/icons-material";
+import { APP_COLORS } from "../constants/colors";
 
-export default function ProjectCard({ project, searchQuery }) {
+export default function ProjectCard({ isSelected, project, searchQuery }) {
   const query = searchQuery.toLowerCase();
 
   const highlightText = (text) => {
@@ -38,13 +38,17 @@ export default function ProjectCard({ project, searchQuery }) {
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
         "&:hover": {
           transform: "translateY(-4px)",
-          boxShadow: 6,
         },
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
         textAlign: "left",
         height: "100%",
+        backgroundColor: isSelected
+          ? APP_COLORS.card_selected
+          : APP_COLORS.card,
+        outline: isSelected ? "2px solid #1976d2" : undefined,
+        outlineOffset: isSelected ? "-2px" : undefined,
       }}
     >
       {/* Project Title */}
@@ -57,7 +61,7 @@ export default function ProjectCard({ project, searchQuery }) {
             wordBreak: "break-word",
             lineHeight: 1.5,
             display: "-webkit-box",
-            WebkitLineClamp: 2, // limits to roughly 3 lines
+            WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -76,7 +80,7 @@ export default function ProjectCard({ project, searchQuery }) {
             color: "#444",
             lineHeight: 1.5,
             display: "-webkit-box",
-            WebkitLineClamp: 3, // limits to roughly 3 lines
+            WebkitLineClamp: 3,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -85,19 +89,6 @@ export default function ProjectCard({ project, searchQuery }) {
         >
           {highlightText(project.description)}
         </Typography>
-
-        {/* Gradient fade overlay */}
-        {/* <Box
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 20,
-            background:
-              "linear-gradient(to bottom, rgba(249,249,249,0), #f9f9f9)",
-          }}
-        /> */}
       </Box>
 
       {/* Deadline */}
@@ -121,69 +112,65 @@ export default function ProjectCard({ project, searchQuery }) {
         </Typography>
       </Box>
 
-      {/* Matched Tasks Section
-      {matchedTasks.length > 0 && (
-        <Box
-          sx={{
-            backgroundColor: "#f1f5ff",
-            borderRadius: 2,
-            p: 1.5,
-            borderLeft: "4px solid #1976d2",
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            sx={{
-              fontWeight: "bold",
-              color: "#1976d2",
-              mb: 0.5,
-            }}
-          >
-            Matched Tasks
-          </Typography>
-
+      {/* Tasks Section */}
+      {matchedTasks.length > 0 && searchQuery.trim() !== "" && (
+        <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 0.5 }}>
           {matchedTasks.map((task, i) => (
             <Box
               key={i}
               sx={{
-                backgroundColor: "#ffffff",
-                borderRadius: 1,
-                p: 1,
-                mb: 0.8,
-                boxShadow: 1,
+                display: "flex",
+                flexDirection: "row",
+                gap: 0.5,
               }}
             >
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                {highlightText(task.name)}
-              </Typography>
               <Typography
-                variant="caption"
+                flex="2"
+                variant="body2"
                 sx={{
-                  display: "block",
-                  color: "text.secondary",
-                  mt: 0.3,
+                  width: "50px",
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                  overflowX: "auto",
+                  overflowY: "hidden",
                 }}
               >
-                Assigned to: {highlightText(task.assignedTo)} <br />
-                Status:{" "}
-                <span
-                  style={{
-                    color:
-                      task.status === "Completed"
-                        ? "#2e7d32"
-                        : task.status === "Pending"
-                          ? "#ed6c02"
-                          : "#1565c0",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {task.status}
-                </span>
+                {highlightText(task.name)}
               </Typography>
+
+              <Chip
+                size="small"
+                flex="1"
+                variant="outlined"
+                label={highlightText(task.assignedTo)}
+                style={{
+                  fontSize: 11,
+                  fontWeight: "bold",
+                  justifyContent: "left",
+                }}
+              />
+
+              <Chip
+                size="small"
+                flex="1"
+                variant="outlined"
+                label={task.status}
+                style={{
+                  fontSize: 11,
+                  color:
+                    task.status === "Completed"
+                      ? APP_COLORS.completed
+                      : task.status === "Pending"
+                        ? APP_COLORS.pending
+                        : APP_COLORS.in_progress,
+                  fontWeight: "bold",
+                  justifyContent: "left",
+                }}
+              />
             </Box>
           ))}
         </Box>
-      )} */}
+      )}
     </Paper>
   );
 }
