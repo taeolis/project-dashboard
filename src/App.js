@@ -1,5 +1,6 @@
+// src/App.js
+import React, { useState, useEffect } from "react";
 import "./App.css";
-import { useState } from "react";
 import {
   TextField,
   InputAdornment,
@@ -10,9 +11,11 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
+
 import NewProjectDialog from "./components/NewProjectDialog";
 import ProjectCard from "./components/ProjectCard";
 import ProjectDetails from "./components/ProjectDetails";
+
 import { APP_COLORS } from "./constants/colors";
 
 function App() {
@@ -21,13 +24,53 @@ function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Load projects and selected project index from localStorage on mount
+  useEffect(() => {
+    const savedProjects = localStorage.getItem("projects");
+    const savedIndex = localStorage.getItem("selectedProjectIndex");
+
+    if (savedProjects) {
+      const parsedProjects = JSON.parse(savedProjects);
+      setProjects(parsedProjects);
+
+      if (savedIndex !== null) {
+        const idx = Number(savedIndex);
+        if (!isNaN(idx) && parsedProjects[idx]) {
+          setSelectedProject(parsedProjects[idx]);
+        }
+      }
+    }
+  }, []);
+
+  // Save projects whenever they change
+  useEffect(() => {
+    localStorage.setItem("projects", JSON.stringify(projects));
+  }, [projects]);
+
+  // Save selected project index whenever selectedProject changes
+  useEffect(() => {
+    if (selectedProject) {
+      const idx = projects.indexOf(selectedProject);
+      if (idx !== -1) {
+        localStorage.setItem("selectedProjectIndex", idx);
+      }
+    } else {
+      // If no project selected, clear index
+      localStorage.removeItem("selectedProjectIndex");
+    }
+  }, [selectedProject, projects]);
+
+  // new project dialog open/close handlers
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  // project creation
   const handleCreateProject = (project) => {
     setProjects((prev) => [...prev, project]);
+    setSelectedProject(project);
   };
 
+  // project update
   const handleUpdateProject = (updatedProject) => {
     setProjects((prev) =>
       prev.map((p) => (p === selectedProject ? updatedProject : p))
@@ -35,19 +78,22 @@ function App() {
     setSelectedProject(updatedProject);
   };
 
+  // project deletion
   const handleDeleteProject = (projectToDelete) => {
     setProjects((prev) => prev.filter((p) => p !== projectToDelete));
     setSelectedProject(null);
   };
 
-  // Filter logic — search both project + tasks
+  // filtering projects and tasks by search query
   const filteredProjects = projects.filter((project) => {
     const query = searchQuery.toLowerCase();
 
+    // matching projects
     const matchesProject =
       project.projectName?.toLowerCase().includes(query) ||
       project.description?.toLowerCase().includes(query);
 
+    // matching tasks
     const matchesTask = project.tasks?.some(
       (task) =>
         task.name?.toLowerCase().includes(query) ||
@@ -73,13 +119,11 @@ function App() {
           <Typography variant="h4" sx={{ fontWeight: "bold" }}>
             Project Dashboard
           </Typography>
-
           <Typography variant="body1">
-            Manage and track your projects
+            Manage your projects and tasks
           </Typography>
         </Box>
 
-        {/* Search Box */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <TextField
             placeholder="Search projects or tasks"
@@ -106,9 +150,6 @@ function App() {
               ),
             }}
           />
-
-          {/* Add New Project Button */}
-
           <Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -127,8 +168,6 @@ function App() {
           </Button>
         </Box>
 
-        {/* Adding new project dialog */}
-
         <NewProjectDialog
           open={open}
           handleClose={handleClose}
@@ -136,13 +175,8 @@ function App() {
         />
       </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-        }}
-      >
-        {/* Project List */}
+      <Box sx={{ display: "flex", gap: 2 }}>
+        {/* Left column: Projects list */}
         <Box
           sx={{
             flex: 1,
@@ -156,9 +190,7 @@ function App() {
             position: "relative",
           }}
         >
-          {/* Header Section (Unchanged) */}
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            {/* Project Count and Title */}
             <Box
               sx={{
                 width: 28,
@@ -184,7 +216,6 @@ function App() {
             </Typography>
           </Box>
 
-          {/* Projects list container (scrollable area) */}
           {filteredProjects.length === 0 ? (
             <Box
               sx={{
@@ -234,8 +265,6 @@ function App() {
                   </Box>
                 ))}
               </Box>
-
-              {/* Gradient Overlay */}
               <Box
                 sx={{
                   position: "absolute",
@@ -250,8 +279,7 @@ function App() {
           )}
         </Box>
 
-        {/* Project Detail*/}
-
+        {/* Right column: Project detail */}
         {selectedProject ? (
           <Box
             sx={{
@@ -266,13 +294,11 @@ function App() {
               backgroundColor: APP_COLORS.card,
             }}
           >
-            {selectedProject && (
-              <ProjectDetails
-                project={selectedProject}
-                onUpdate={handleUpdateProject}
-                onDelete={handleDeleteProject}
-              />
-            )}
+            <ProjectDetails
+              project={selectedProject}
+              onUpdate={handleUpdateProject}
+              onDelete={handleDeleteProject}
+            />
           </Box>
         ) : (
           <Box

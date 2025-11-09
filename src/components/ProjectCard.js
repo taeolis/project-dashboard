@@ -1,11 +1,13 @@
+import React, { memo, useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import { Paper, Typography, Box } from "@mui/material";
 import { AccessTime } from "@mui/icons-material";
 import { APP_COLORS } from "../constants/colors";
 
-export default function ProjectCard({ isSelected, project, searchQuery }) {
-  const query = searchQuery.toLowerCase();
+function ProjectCardBase({ isSelected, project, searchQuery }) {
+  const query = (searchQuery || "").toLowerCase();
 
+  // highlight matched projects or tasks by search query
   const highlightText = (text) => {
     if (!query || !text) return text;
     const regex = new RegExp(`(${query})`, "gi");
@@ -21,12 +23,15 @@ export default function ProjectCard({ isSelected, project, searchQuery }) {
     );
   };
 
-  const matchedTasks =
-    project.tasks?.filter(
+  // compute matched tasks only when project.tasks or query changes
+  const matchedTasks = useMemo(() => {
+    if (!project.tasks || !query) return [];
+    return project.tasks.filter(
       (t) =>
-        t.name.toLowerCase().includes(query) ||
-        t.assignedTo.toLowerCase().includes(query)
-    ) || [];
+        t.name?.toLowerCase().includes(query) ||
+        t.assignedTo?.toLowerCase().includes(query)
+    );
+  }, [project.tasks, query]);
 
   return (
     <Paper
@@ -51,7 +56,7 @@ export default function ProjectCard({ isSelected, project, searchQuery }) {
         outlineOffset: isSelected ? "-2px" : undefined,
       }}
     >
-      {/* Project Title */}
+      {/* Project Name */}
       <Box>
         <Typography
           variant="h6"
@@ -112,18 +117,15 @@ export default function ProjectCard({ isSelected, project, searchQuery }) {
         </Typography>
       </Box>
 
-      {/* Tasks Section */}
-      {matchedTasks.length > 0 && searchQuery.trim() !== "" && (
+      {/* Tasks Overview: display only when searching */}
+      {matchedTasks.length > 0 && query.trim() !== "" && (
         <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 0.5 }}>
           {matchedTasks.map((task, i) => (
             <Box
               key={i}
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                gap: 0.5,
-              }}
+              sx={{ display: "flex", flexDirection: "row", gap: 0.5 }}
             >
+              {/* Task name */}
               <Typography
                 flex="2"
                 variant="body2"
@@ -138,24 +140,26 @@ export default function ProjectCard({ isSelected, project, searchQuery }) {
                 {highlightText(task.name)}
               </Typography>
 
+              {/* Assigned to chip */}
               <Chip
                 size="small"
                 flex="1"
                 variant="outlined"
                 label={highlightText(task.assignedTo)}
-                style={{
+                sx={{
                   fontSize: 11,
                   fontWeight: "bold",
                   justifyContent: "left",
                 }}
               />
 
+              {/* Status chip */}
               <Chip
                 size="small"
                 flex="1"
                 variant="outlined"
                 label={task.status}
-                style={{
+                sx={{
                   fontSize: 11,
                   color:
                     task.status === "Completed"
@@ -174,3 +178,6 @@ export default function ProjectCard({ isSelected, project, searchQuery }) {
     </Paper>
   );
 }
+
+// Memoize the component to avoid unnecessary re‑renders (best practice) :contentReference[oaicite:0]{index=0}
+export default memo(ProjectCardBase);

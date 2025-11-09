@@ -20,6 +20,7 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
     deadline: false,
   });
 
+  // Create the project
   const handleCreate = () => {
     const newErrors = {
       projectName: !projectName,
@@ -27,13 +28,18 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
     };
 
     setErrors(newErrors);
-
     if (newErrors.projectName || newErrors.deadline) return;
 
     if (onCreate) {
-      onCreate({ projectName, deadline, description });
+      onCreate({
+        projectName,
+        deadline,
+        description,
+        tasks: [],
+      });
     }
 
+    // Reset fields
     setProjectName("");
     setDeadline("");
     setDescription("");
@@ -46,12 +52,7 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
       open={open}
       onClose={handleClose}
       PaperProps={{
-        sx: {
-          width: 500,
-          maxWidth: "90%",
-          borderRadius: 3,
-          padding: 2,
-        },
+        sx: { width: 500, maxWidth: "90%", borderRadius: 3, padding: 2 },
       }}
     >
       <DialogTitle>
@@ -62,14 +63,10 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
           Create New Project
         </Typography>
       </DialogTitle>
+
       <DialogContent>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-          }}
-        >
+        <Box sx={{ display: "flex", flexDirection: "row", width: "100%" }}>
+          {/* Left labels */}
           <Box
             sx={{
               flex: 1,
@@ -79,23 +76,11 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
               mt: 3,
             }}
           >
-            <Typography
-              sx={{
-                alignContent: "center",
-              }}
-            >
-              Name
-            </Typography>
-
-            <Typography
-              sx={{
-                alignContent: "center",
-              }}
-            >
-              Deadline
-            </Typography>
+            <Typography>Name</Typography>
+            <Typography>Deadline</Typography>
           </Box>
 
+          {/* Right input fields */}
           <Box sx={{ flex: 4 }}>
             <TextField
               autoFocus
@@ -110,24 +95,19 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
               }}
               error={errors.projectName}
               helperText={errors.projectName ? "Project name is required" : ""}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "10px",
-                },
-              }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
             />
 
             <TextField
               margin="dense"
-              required
               type="date"
+              required
               fullWidth
               value={deadline}
               onChange={(e) => {
                 setDeadline(e.target.value);
                 setErrors({ ...errors, deadline: false });
               }}
-              variant="outlined"
               error={errors.deadline}
               helperText={errors.deadline ? "Deadline is required" : ""}
               InputLabelProps={{ shrink: true }}
@@ -141,35 +121,30 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
           </Box>
         </Box>
 
+        {/* Description */}
         <TextField
           margin="dense"
           label="Description"
-          type="text"
+          multiline
+          rows={4}
           fullWidth
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          variant="outlined"
-          multiline
-          rows={4}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "10px",
-            },
-          }}
+          sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
         />
       </DialogContent>
+
       <DialogActions>
         <Button onClick={handleClose} sx={{ color: APP_COLORS.button }}>
           Cancel
         </Button>
+
         <Button
           variant="contained"
           onClick={handleCreate}
           sx={{
             backgroundColor: APP_COLORS.button,
-            "&:hover": {
-              backgroundColor: APP_COLORS.button_hovered,
-            },
+            "&:hover": { backgroundColor: APP_COLORS.button_hovered },
           }}
         >
           Create

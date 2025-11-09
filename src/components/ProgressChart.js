@@ -1,4 +1,12 @@
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { useMemo } from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import { Box } from "@mui/material";
 import { APP_COLORS } from "../constants/colors";
 
@@ -8,7 +16,7 @@ const COLORS = [
   APP_COLORS.pending,
 ];
 
-export default function ProgressChart({ tasks }) {
+export default function ProgressChart({ tasks = [] }) {
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((t) => t.status === "Completed").length;
   const inProgressTasks = tasks.filter(
@@ -16,14 +24,17 @@ export default function ProgressChart({ tasks }) {
   ).length;
   const pendingTasks = tasks.filter((t) => t.status === "Pending").length;
 
-  const data =
-    totalTasks > 0
-      ? [
-          { name: "Completed", value: completedTasks },
-          { name: "In Progress", value: inProgressTasks },
-          { name: "Pending", value: pendingTasks },
-        ]
-      : [{ name: "None", value: 1 }];
+  const data = useMemo(() => {
+    if (totalTasks > 0) {
+      return [
+        { name: "Completed", value: completedTasks },
+        { name: "In Progress", value: inProgressTasks },
+        { name: "Pending", value: pendingTasks },
+      ];
+    } else {
+      return [{ name: "None", value: 1 }];
+    }
+  }, [totalTasks, completedTasks, inProgressTasks, pendingTasks]);
 
   const chartColors = totalTasks > 0 ? COLORS : ["#a9a9a9ff"];
 
@@ -49,8 +60,8 @@ export default function ProgressChart({ tasks }) {
           justifyContent: "center",
         }}
       >
-        <div style={{ width: 250, height: 200 }}>
-          <PieChart width={300} height={200}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
             <Pie
               data={data}
               cx="50%"
@@ -58,15 +69,15 @@ export default function ProgressChart({ tasks }) {
               outerRadius={70}
               cornerRadius={5}
               dataKey="value"
+              nameKey="name"
             >
-              {data.map((_, index) => (
+              {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={chartColors[index % chartColors.length]}
                 />
               ))}
             </Pie>
-
             <Tooltip />
             <Legend
               layout="vertical"
@@ -74,13 +85,13 @@ export default function ProgressChart({ tasks }) {
               verticalAlign="middle"
               iconType="circle"
               wrapperStyle={{
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: 500,
                 lineHeight: "2em",
               }}
             />
           </PieChart>
-        </div>
+        </ResponsiveContainer>
       </Box>
     </Box>
   );

@@ -10,6 +10,7 @@ import {
   InputLabel,
   IconButton,
   Menu,
+  Snackbar,
 } from "@mui/material";
 import Task from "./Task";
 import EditIcon from "@mui/icons-material/Edit";
@@ -34,7 +35,18 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(name);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
   const open = Boolean(anchorEl);
+
+  // Sync local state when project prop changes
+  useEffect(() => {
+    setName(project.projectName);
+    setTempName(project.projectName);
+    setDeadline(project.deadline);
+    setDescription(project.description);
+    setTasks(project.tasks || []);
+  }, [project]);
 
   const handleChipClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -54,53 +66,51 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
       ? tasks
       : tasks.filter((task) => task.status === filterStatus);
 
-  useEffect(() => {
-    setName(project.projectName);
-    setDeadline(project.deadline);
-    setDescription(project.description);
-    setTasks(project.tasks || []);
-  }, [project]);
-
-  const handleUpdate = () => {
-    onUpdate({ ...project, projectName: name, deadline, description, tasks });
-  };
-
-  const handleDelete = () => {
-    onDelete(project);
-  };
-
-  const handleAddTask = () => {
-    if (!newTask.name || !newTask.assignedTo) return;
-    const updatedTasks = [...tasks, newTask];
-    setTasks(updatedTasks);
-    setNewTask({ name: "", assignedTo: "", status: "Pending" });
-  };
-
-  const handleDeleteTask = (index) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
-    setTasks(updatedTasks);
-  };
-
-  const handleUpdateTask = (index, updatedTask) => {
-    const updatedTasks = tasks.map((t, i) => (i === index ? updatedTask : t));
-    setTasks(updatedTasks);
-  };
-
   const handleEditClick = () => setIsEditing(true);
   const handleCancel = () => {
     setTempName(name);
     setIsEditing(false);
   };
 
-  const handleSave = () => {
+  const handleSaveName = () => {
     setName(tempName);
     setIsEditing(false);
+  };
+
+  const handleAddTask = () => {
+    if (!newTask.name || !newTask.assignedTo) return;
+    setTasks((prev) => [...prev, newTask]);
+    setNewTask({ name: "", assignedTo: "", status: "Pending" });
+  };
+
+  const handleDeleteTask = (index) => {
+    setTasks((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateTask = (index, updatedTask) => {
+    setTasks((prev) => prev.map((t, i) => (i === index ? updatedTask : t)));
+  };
+
+  const handleUpdateClick = () => {
+    const updated = {
+      ...project,
+      projectName: name,
+      deadline,
+      description,
+      tasks,
+    };
+    onUpdate(updated);
+    setSnackMessage("Project updated successfully!");
+    setSnackOpen(true);
+  };
+
+  const handleDeleteProject = () => {
+    onDelete(project);
   };
 
   return (
     <Box sx={{ p: 2, borderRadius: 2 }}>
       <Box sx={{ display: "flex", mb: 2 }}>
-        {/* Editing Project (Left Column) */}
         <Box sx={{ flex: 2, textAlign: "start" }}>
           {isEditing ? (
             <Box sx={{ mb: 2 }}>
@@ -109,15 +119,11 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 size="normal"
-                sx={{
-                  my: 1,
-                  width: 400,
-                }}
+                sx={{ my: 1, width: 400 }}
               />
-              <IconButton onClick={handleSave} color="success">
+              <IconButton onClick={handleSaveName} color="success">
                 <CheckIcon />
               </IconButton>
-
               <IconButton onClick={handleCancel} color="error">
                 <CloseIcon />
               </IconButton>
@@ -154,7 +160,6 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
           />
         </Box>
 
-        {/* Progress Chart Section */}
         <Box sx={{ flex: 2 }}>
           <Box
             sx={{
@@ -166,7 +171,9 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
             }}
           >
             <Chip
-              label={`Completed: ${tasks.filter((t) => t.status === "Completed").length} / ${tasks.length}`}
+              label={`Completed: ${
+                tasks.filter((t) => t.status === "Completed").length
+              } / ${tasks.length}`}
               variant="filled"
               sx={{
                 width: 200,
@@ -179,8 +186,6 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
           </Box>
         </Box>
       </Box>
-
-      {/* Task Count */}
 
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Box
@@ -205,7 +210,6 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
         </Typography>
       </Box>
 
-      {/* Add New Task */}
       <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
           <TextField
@@ -244,19 +248,16 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
             onClick={handleAddTask}
             sx={{
               backgroundColor: APP_COLORS.button,
-              "&:hover": {
-                backgroundColor: APP_COLORS.button_hovered,
-              },
+              "&:hover": { backgroundColor: APP_COLORS.button_hovered },
             }}
           >
             Add Task
           </Button>
         </Box>
 
-        {/* Filter Tasks Chip */}
         <Box sx={{ flex: 1, textAlign: "right" }}>
           <Chip
-            label={`${filterStatus}`}
+            label={filterStatus}
             onClick={handleChipClick}
             icon={<FilterListIcon />}
             size="medium"
@@ -267,19 +268,14 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
             aria-label="Filter Tasks"
             sx={{ borderRadius: 1, py: 2.5, px: 0.5 }}
           />
-
-          {/* Menu Component - Dropdown box */}
           <Menu
             id="filter-menu"
             anchorEl={anchorEl}
             open={open}
             onClose={handleMenuClose}
-            MenuListProps={{
-              "aria-labelledby": "filter-chip",
-            }}
+            MenuListProps={{ "aria-labelledby": "filter-chip" }}
             sx={{ borderRadius: 5 }}
           >
-            {/* The Options (Menu Items) */}
             <MenuItem onClick={() => handleFilterSelect("All")}>
               All Tasks
             </MenuItem>
@@ -296,8 +292,6 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
         </Box>
       </Box>
 
-      {/* Task List */}
-      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -312,7 +306,6 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
           borderTopRightRadius: 3,
         }}
       >
-        {/* Column Titles */}
         <Box sx={{ display: "flex", flexGrow: 1, alignItems: "center" }}>
           <Typography variant="body2" sx={{ width: "30%", fontWeight: "bold" }}>
             TASK NAME
@@ -324,7 +317,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
             STATUS
           </Typography>
         </Box>
-        <Box sx={{ minWidth: "70px" }}></Box>
+        <Box sx={{ minWidth: "70px" }} />
       </Box>
 
       {displayedTasks.length === 0 ? (
@@ -360,28 +353,27 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
         </Box>
       )}
 
-      {/* Update and Delete Button */}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          mt: 3,
-          justifyContent: "flex-end",
-        }}
-      >
+      <Box sx={{ display: "flex", gap: 2, mt: 3, justifyContent: "flex-end" }}>
         <Button
           variant="contained"
-          onClick={handleUpdate}
           sx={{
             backgroundColor: APP_COLORS.button,
-            "&:hover": {
-              backgroundColor: APP_COLORS.button_hovered,
-            },
+            "&:hover": { backgroundColor: APP_COLORS.button_hovered },
           }}
+          onClick={handleUpdateClick}
         >
           Update Project
         </Button>
-        <Button variant="outlined" color="error" onClick={handleDelete}>
+
+        <Snackbar
+          open={snackOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackOpen(false)}
+          message={snackMessage}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        />
+
+        <Button variant="outlined" color="error" onClick={handleDeleteProject}>
           Delete Project
         </Button>
       </Box>
