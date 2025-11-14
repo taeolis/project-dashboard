@@ -1,4 +1,4 @@
-# Development of a Web-based App using React.js
+# Web-based App using React.js
 
 ## Project Title
 
