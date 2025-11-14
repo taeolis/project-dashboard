@@ -1,3 +1,4 @@
+// src/components/Task.js
 import { useState } from "react";
 import {
   Box,
@@ -45,12 +46,13 @@ export default function Task({ task, onDelete, onUpdate }) {
             <Box
               sx={{
                 display: "flex",
-                gap: 12,
+                gap: 5,
                 flexWrap: "wrap",
                 flexGrow: 1,
                 alignItems: "center",
               }}
             >
+              {/* editable task name field */}
               <TextField
                 placeholder="Task Name"
                 value={editedTask.name}
@@ -58,26 +60,32 @@ export default function Task({ task, onDelete, onUpdate }) {
                   setEditedTask({ ...editedTask, name: e.target.value })
                 }
                 size="small"
-                sx={{ ml: 5, alignItems: "center" }}
+                sx={{ ml: 15, alignItems: "center" }}
                 InputProps={{
                   sx: {
+                    width: 300,
                     height: 30,
                   },
                 }}
               />
+
+              {/* editable task assigned to field */}
               <TextField
                 size="small"
                 value={editedTask.assignedTo}
                 onChange={(e) =>
                   setEditedTask({ ...editedTask, assignedTo: e.target.value })
                 }
-                sx={{ minWidth: 120 }}
+                sx={{ ml: 12 }}
                 InputProps={{
                   sx: {
+                    width: 150,
                     height: 30,
                   },
                 }}
               />
+
+              {/* editable task status dropbox */}
               <Select
                 size="small"
                 value={editedTask.status}
@@ -85,7 +93,7 @@ export default function Task({ task, onDelete, onUpdate }) {
                   setEditedTask({ ...editedTask, status: e.target.value })
                 }
                 sx={{
-                  minWidth: 120,
+                  minWidth: 100,
                   "& .MuiSelect-select": {
                     height: "20px",
                     display: "flex",
@@ -101,6 +109,7 @@ export default function Task({ task, onDelete, onUpdate }) {
             </Box>
 
             <Box sx={{ display: "flex", gap: 0.5 }}>
+              {/* save task editing */}
               <IconButton
                 onClick={handleSave}
                 size="small"
@@ -108,6 +117,8 @@ export default function Task({ task, onDelete, onUpdate }) {
               >
                 <Save />
               </IconButton>
+
+              {/* cancel task editing */}
               <IconButton
                 onClick={handleCancel}
                 size="small"
@@ -120,24 +131,51 @@ export default function Task({ task, onDelete, onUpdate }) {
         ) : (
           <>
             {/* Read-only Fields */}
-            <Box sx={{ display: "flex", flexGrow: 1, alignItems: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexGrow: 1,
+                alignItems: "center",
+              }}
+            >
+              {/* task name display */}
               <Typography
                 variant="body1"
                 sx={{
-                  width: "30%",
+                  ml: 2,
+                  width: 500, // fixed width in px
+                  whiteSpace: "nowrap", // keep text on a single line
+                  overflow: "hidden", // hide overflow
+                  textOverflow: "ellipsis", // show "..." for overflowed text
                 }}
               >
                 {task.name}
               </Typography>
-              <Typography variant="body2" sx={{ width: "30%" }}>
-                {task.assignedTo}
-              </Typography>
 
+              {/* task assigned to display */}
               <Typography
                 variant="body2"
                 sx={{
-                  width: "30%",
+                  width: 200, // fixed width
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  ml: 2,
+                }}
+              >
+                {task.assignedTo}
+              </Typography>
+
+              {/* task status display */}
+              <Typography
+                variant="body2"
+                sx={{
+                  width: 120, // fixed width
                   fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  ml: 2,
                   color:
                     task.status === "Completed"
                       ? APP_COLORS.completed
@@ -150,11 +188,13 @@ export default function Task({ task, onDelete, onUpdate }) {
               </Typography>
             </Box>
 
+            {/* Buttons */}
             <Box
               sx={{
                 display: "flex",
                 gap: 0.5,
                 justifyContent: "left",
+                mt: 1, // optional spacing
               }}
             >
               <IconButton
@@ -164,6 +204,7 @@ export default function Task({ task, onDelete, onUpdate }) {
               >
                 <Edit />
               </IconButton>
+
               <IconButton
                 onClick={onDelete}
                 size="small"
@@ -176,6 +217,7 @@ export default function Task({ task, onDelete, onUpdate }) {
         )}
       </Box>
 
+      {/* separation between each task for table-like visual */}
       <Divider variant="fullWidth" />
     </>
   );

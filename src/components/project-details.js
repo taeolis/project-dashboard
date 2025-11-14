@@ -1,3 +1,4 @@
+// src/components/ProjectDetails.js
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -12,13 +13,13 @@ import {
   Menu,
   Snackbar,
 } from "@mui/material";
-import Task from "./Task";
+import Task from "./task";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import Chip from "@mui/material/Chip";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import ProgressChart from "./ProgressChart";
+import ProgressChart from "./progress-chart";
 import { APP_COLORS } from "../constants/colors";
 
 export default function ProjectDetails({ project, onUpdate, onDelete }) {
@@ -48,6 +49,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
     setTasks(project.tasks || []);
   }, [project]);
 
+  // Task filter handling
   const handleChipClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -66,31 +68,37 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
       ? tasks
       : tasks.filter((task) => task.status === filterStatus);
 
+  // Task edition
   const handleEditClick = () => setIsEditing(true);
   const handleCancel = () => {
     setTempName(name);
     setIsEditing(false);
   };
 
+  // Task change save
   const handleSaveName = () => {
     setName(tempName);
     setIsEditing(false);
   };
 
+  // Task addition
   const handleAddTask = () => {
     if (!newTask.name || !newTask.assignedTo) return;
     setTasks((prev) => [...prev, newTask]);
     setNewTask({ name: "", assignedTo: "", status: "Pending" });
   };
 
+  // Task deletion
   const handleDeleteTask = (index) => {
     setTasks((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Task update
   const handleUpdateTask = (index, updatedTask) => {
     setTasks((prev) => prev.map((t, i) => (i === index ? updatedTask : t)));
   };
 
+  // Project update
   const handleUpdateClick = () => {
     const updated = {
       ...project,
@@ -100,10 +108,11 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
       tasks,
     };
     onUpdate(updated);
-    setSnackMessage("Project updated successfully!");
+    setSnackMessage("Project updated successfully!"); // update confirm snackbar
     setSnackOpen(true);
   };
 
+  // Project delete
   const handleDeleteProject = () => {
     onDelete(project);
   };
@@ -111,7 +120,9 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
   return (
     <Box sx={{ p: 2, borderRadius: 2 }}>
       <Box sx={{ display: "flex", mb: 2 }}>
+        {/* Upper left column - edit project title, deadline and description */}
         <Box sx={{ flex: 2, textAlign: "start" }}>
+          {/* Edit project title */}
           {isEditing ? (
             <Box sx={{ mb: 2 }}>
               <TextField
@@ -139,6 +150,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
             </Box>
           )}
 
+          {/* Edit project deadline */}
           <TextField
             variant="outlined"
             label="Deadline"
@@ -150,6 +162,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
             sx={{ my: 1, textAlign: "left", width: 280 }}
           />
 
+          {/* Edit project description */}
           <TextField
             label="Description"
             value={description}
@@ -160,7 +173,9 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
           />
         </Box>
 
+        {/* Upper right column - task progress visualization */}
         <Box sx={{ flex: 2 }}>
+          {/* Complete vs Total tasks */}
           <Box
             sx={{
               display: "flex",
@@ -182,12 +197,15 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
                 color: "#f0f3f7",
               }}
             />
+            {/* Task progress piechart */}
             <ProgressChart tasks={tasks} />
           </Box>
         </Box>
       </Box>
 
+      {/* Tasks */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        {/* Task count display */}
         <Box
           sx={{
             width: 25,
@@ -210,8 +228,10 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
         </Typography>
       </Box>
 
+      {/* Task inputs - task name, assigned to, status, add task button + filter task */}
       <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+          {/* Task name input */}
           <TextField
             placeholder="Task Name"
             value={newTask.name}
@@ -219,6 +239,8 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
             size="small"
             sx={{ width: 250 }}
           />
+
+          {/* Task assigned to input */}
           <TextField
             placeholder="Assigned To"
             value={newTask.assignedTo}
@@ -228,6 +250,8 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
             size="small"
             sx={{ width: 250 }}
           />
+
+          {/* Task status drop box */}
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <InputLabel>Status</InputLabel>
             <Select
@@ -243,6 +267,8 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
               <MenuItem value="Completed">Completed</MenuItem>
             </Select>
           </FormControl>
+
+          {/* Add Task button */}
           <Button
             variant="contained"
             onClick={handleAddTask}
@@ -255,6 +281,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
           </Button>
         </Box>
 
+        {/* Task filter by status menu */}
         <Box sx={{ flex: 1, textAlign: "right" }}>
           <Chip
             label={filterStatus}
@@ -292,6 +319,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
         </Box>
       </Box>
 
+      {/* Task display */}
       <Box
         sx={{
           display: "flex",
@@ -306,20 +334,48 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
           borderTopRightRadius: 3,
         }}
       >
-        <Box sx={{ display: "flex", flexGrow: 1, alignItems: "center" }}>
-          <Typography variant="body2" sx={{ width: "30%", fontWeight: "bold" }}>
+        {/* Task display header */}
+        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              width: 500, // same as task name field
+              fontWeight: "bold",
+              ml: 2,
+            }}
+          >
             TASK NAME
           </Typography>
-          <Typography variant="body2" sx={{ width: "30%", fontWeight: "bold" }}>
+
+          <Typography
+            variant="body2"
+            sx={{
+              width: 200, // same as assignedTo field
+              fontWeight: "bold",
+              ml: 2,
+            }}
+          >
             ASSIGNED TO
           </Typography>
-          <Typography variant="body2" sx={{ width: "30%", fontWeight: "bold" }}>
+
+          <Typography
+            variant="body2"
+            sx={{
+              width: 120, // same as status field
+              fontWeight: "bold",
+              ml: 2,
+            }}
+          >
             STATUS
           </Typography>
         </Box>
-        <Box sx={{ minWidth: "70px" }} />
+
+        {/* Optional spacer for buttons */}
+        <Box sx={{ width: 70 }} />
       </Box>
 
+      {/* Present tasks display */}
+      {/* default empty task display */}
       {displayedTasks.length === 0 ? (
         <Box
           sx={{
@@ -333,6 +389,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
           <Typography sx={{ color: "#979797ff" }}>No Tasks</Typography>
         </Box>
       ) : (
+        // non-empty task display
         <Box
           sx={{
             height: 150,
@@ -354,6 +411,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
       )}
 
       <Box sx={{ display: "flex", gap: 2, mt: 3, justifyContent: "flex-end" }}>
+        {/* Update Project button */}
         <Button
           variant="contained"
           sx={{
@@ -365,6 +423,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
           Update Project
         </Button>
 
+        {/* project update success confirm snackbar */}
         <Snackbar
           open={snackOpen}
           autoHideDuration={3000}
@@ -373,6 +432,7 @@ export default function ProjectDetails({ project, onUpdate, onDelete }) {
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         />
 
+        {/* Delete Project button */}
         <Button variant="outlined" color="error" onClick={handleDeleteProject}>
           Delete Project
         </Button>

@@ -1,3 +1,4 @@
+// src/components/NewProjectDialog.js
 import { useState } from "react";
 import {
   Box,
@@ -72,7 +73,7 @@ export default function NewProjectDialog({ open, handleClose, onCreate }) {
               flex: 1,
               display: "flex",
               flexDirection: "column",
-              gap: 8,
+              gap: 5,
               mt: 3,
             }}
           >

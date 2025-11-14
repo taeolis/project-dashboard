@@ -1,6 +1,7 @@
-import React, { memo, useMemo } from "react";
-import Chip from "@mui/material/Chip";
+// src/components/ProjectCard.js
+import { memo, useMemo } from "react";
 import { Paper, Typography, Box } from "@mui/material";
+import Chip from "@mui/material/Chip";
 import { AccessTime } from "@mui/icons-material";
 import { APP_COLORS } from "../constants/colors";
 
@@ -179,5 +180,4 @@ function ProjectCardBase({ isSelected, project, searchQuery }) {
   );
 }
 
-// Memoize the component to avoid unnecessary re‑renders (best practice) :contentReference[oaicite:0]{index=0}
 export default memo(ProjectCardBase);

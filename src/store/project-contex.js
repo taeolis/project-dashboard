@@ -1,11 +1,11 @@
-// src/context/ProjectContext.js
-import React, { createContext, useState, useEffect } from "react";
+// src/store/ProjectContext.js
+import { createContext, useState, useEffect } from "react";
 
 // Create the context
 export const ProjectContext = createContext();
 
 export const ProjectProvider = ({ children }) => {
-  // Initialize projects from localStorage (lazy init)
+  // Initialize projects from localStorage
   const [projects, setProjects] = useState(() => {
     const saved = localStorage.getItem("projects");
     return saved ? JSON.parse(saved) : [];
@@ -31,7 +31,7 @@ export const ProjectProvider = ({ children }) => {
     setProjects((prev) => prev.filter((p) => p.id !== projectId));
   };
 
-  // Optional: tasks methods (if storing tasks within projects)
+  // CRUD for tasks
   const addTask = (projectId, task) => {
     setProjects((prev) =>
       prev.map((p) =>

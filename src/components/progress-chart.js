@@ -1,3 +1,4 @@
+// src/components/ProgressChart.js
 import { useMemo } from "react";
 import {
   PieChart,
@@ -10,6 +11,7 @@ import {
 import { Box } from "@mui/material";
 import { APP_COLORS } from "../constants/colors";
 
+// task status colors
 const COLORS = [
   APP_COLORS.completed,
   APP_COLORS.in_progress,

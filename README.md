@@ -1,46 +1,66 @@
-# React Project & Task Management Dashboard
+# Development of a Web-based App using React.js
 
-## Project Title  
-React Project & Task Management Dashboard
+## Project Title
 
-## 📖 Description  
-A web application built with React.js that allows users to  
-- Create, edit, and delete projects (title, description, deadline)  
-- Add, edit, delete, and manage tasks within each project (task name, assigned to, status)  
-- Filter projects and tasks, search by keywords
-- Search projects and tasks by keywords  
-- Visualize task progress for each project via chart
-- Persist data locally in the browser using localStorage
-  This app demonstrates component‑based design, React hooks, state management, Material‑UI (MUI), and deployment readiness.
+React Project Management Dashboard
 
-## Features  
-- **Project Management:** Create, edit, delete projects  
-- **Task Management:** Manage tasks inside each project (status: Pending, In Progress, Completed)  
-- **Search & Filter:** Search projects/tasks by keyword, filter tasks by status  
-- **Progress Visualization:** Pie charts / progress indicators showing completion rates  
-- **Persistence:** Uses `localStorage` to retain data across browser sessions  
-- **Responsive UI:** Built using MUI for fast, mobile‑friendly layout
+## Description
+
+A web-based React Project & Task Management Dashboard where users can create projects, manage tasks, track their progress, and visualize completion using a piechart.
+
+This web page demonstrates component‑based design using React hooks, state management and Material‑UI (MUI)
+
+## Features
+
+- **Project Management:** Create, edit, delete projects
+
+- **Task Management:** Manage tasks inside each project (status: Pending, In Progress, Completed)
+
+- **Search & Filter:** Search projects/tasks by keyword, filter tasks by status
+
+- **Progress Visualization:** Piechart showing task completion progress
+
+- **Persistence:** Uses `localStorage` to retain data
 
 ## Installation Steps:
+
 1. git clone https://github.com/<username>/project-dashboard.git
 2. cd project-dashboard
 3. npm install
 4. npm start
 
-## Demo  
-Live app: [Insert your deployment link here]  
-Demo video (2‑3 minutes): [Insert video link here]
+## Dependencies Used
 
-## Dependencies Used 
-- **React**
-- `react-router-dom` for routing  
-- `recharts` or `react-chartjs-2` + `chart.js` for charts  
-- Material UI (`@mui/material`, `@mui/icons-material`)  
-- Git & GitHub (for version control & deployment)  
-- localStorage (for client‑side persistence)  
+`@mui/icons-material : "^7.3.4"`
 
-Installation example:
+`@mui/material : "^7.3.4"`
+
+`react : "^19.2.0"`
+
+`react-dom : "^19.2.0"`
+
+`recharts : "^3.3.0"`
+
+`web-vitals : "^2.1.4"`
+
+Installations:
+
 ```bash
 npm install react-router-dom
+npm install @mui/material
 npm install recharts
-npm install @mui/material @emotion/react @emotion/styled
+```
+
+## Usage Instruction
+
+1. Launch the app (npm start)
+2. Click New Project → fill in Title(required), Deadline(required) and Description
+3. Select the project in the left panel to view/edit it
+4. Inside Project Details: add tasks, assign to, update status
+5. Observe progress via piechart and summary badge
+6. Use search bar to find projects/tasks
+7. Refresh browser → your data remains (localStorage)
+
+## Demo
+
+Demo video : https://drive.google.com/file/d/1O3LJOb8q2-YTQobst80RO7S4CwHeZDwa/view?usp=sharing
