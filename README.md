@@ -24,7 +24,7 @@ This web page demonstrates component‑based design using React hooks, state man
 
 ## Installation Steps:
 
-1. git clone https://github.com/<username>/project-dashboard.git
+1. git clone https://github.com/taeolis/project-dashboard.git
 2. cd project-dashboard
 3. npm install
 4. npm start
